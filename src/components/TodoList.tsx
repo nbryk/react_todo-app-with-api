@@ -44,36 +44,19 @@ export const TodoList = ({
       ))}
 
       {tempTodo && (
-        <div key="temp" data-cy="Todo" className="todo">
-          <label className="todo__status-label">
-            <input
-              data-cy="TodoStatus"
-              type="checkbox"
-              className="todo__status"
-              checked={tempTodo.completed}
-              aria-label="Toggle todo completion"
-              disabled
-            />
-          </label>
-
-          <span data-cy="TodoTitle" className="todo__title">
-            {tempTodo.title}
-          </span>
-
-          <button
-            type="button"
-            className="todo__remove"
-            data-cy="TodoDelete"
-            disabled
-          >
-            ×
-          </button>
-
-          <div data-cy="TodoLoader" className="modal overlay is-active">
-            <div className="modal-background has-background-white-ter" />
-            <div className="loader" />
-          </div>
-        </div>
+        <TodoItem
+          key="temp"
+          todo={tempTodo}
+          handleToggleTodo={() => {}}
+          handleDeleteTodo={() => {}}
+          handleRenameTodo={() => {}}
+          setEditingTodoId={() => {}}
+          deletingTodoIds={[]}
+          togglingTodoIds={[]}
+          renamingTodoIds={[]}
+          editingTodoId={null}
+          isTemp={true}
+        />
       )}
     </section>
   );

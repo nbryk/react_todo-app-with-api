@@ -12,6 +12,7 @@ interface PropsTodoItem {
   handleRenameTodo: (todo: Todo, newTitle: string) => void;
   setEditingTodoId: (id: number | null) => void;
   handleDeleteTodo: (id: number) => void;
+  isTemp?: boolean;
 }
 
 export const TodoItem = ({
@@ -24,6 +25,7 @@ export const TodoItem = ({
   handleRenameTodo,
   setEditingTodoId,
   handleDeleteTodo,
+  isTemp,
 }: PropsTodoItem) => {
   const [editedTitle, setEditedTitle] = useState('');
 
@@ -41,6 +43,7 @@ export const TodoItem = ({
           aria-label="Toggle todo completion"
           onChange={() => handleToggleTodo(todo)}
           disabled={
+            isTemp ||
             deletingTodoIds.includes(todo.id) ||
             togglingTodoIds.includes(todo.id) ||
             renamingTodoIds.includes(todo.id)
@@ -48,7 +51,7 @@ export const TodoItem = ({
         />
       </label>
 
-      {editingTodoId === todo.id ? (
+      {editingTodoId === todo.id && !isTemp ? (
         <form
           onSubmit={event => {
             event.preventDefault();
@@ -77,15 +80,17 @@ export const TodoItem = ({
           data-cy="TodoTitle"
           className="todo__title"
           onDoubleClick={() => {
-            setEditingTodoId(todo.id);
-            setEditedTitle(todo.title);
+            if (!isTemp) {
+              setEditingTodoId(todo.id);
+              setEditedTitle(todo.title);
+            }
           }}
         >
           {todo.title}
         </span>
       )}
 
-      {editingTodoId !== todo.id && (
+      {editingTodoId !== todo.id && !isTemp && (
         <button
           type="button"
           className="todo__remove"
@@ -101,24 +106,16 @@ export const TodoItem = ({
         </button>
       )}
 
-      {deletingTodoIds.includes(todo.id) && (
+      {(deletingTodoIds.includes(todo.id) ||
+        togglingTodoIds.includes(todo.id) ||
+        renamingTodoIds.includes(todo.id) ||
+        isTemp) && (
         <div data-cy="TodoLoader" className="modal overlay is-active">
           <div className="modal-background has-background-white-ter" />
           <div className="loader" />
         </div>
       )}
-      {togglingTodoIds.includes(todo.id) && (
-        <div data-cy="TodoLoader" className="modal overlay is-active">
-          <div className="modal-background has-background-white-ter" />
-          <div className="loader" />
-        </div>
-      )}
-      {renamingTodoIds.includes(todo.id) && (
-        <div data-cy="TodoLoader" className="modal overlay is-active">
-          <div className="modal-background has-background-white-ter" />
-          <div className="loader" />
-        </div>
-      )}
+
       <div data-cy="TodoLoader" className="modal overlay">
         <div className="modal-background has-background-white-ter" />
         <div className="loader" />

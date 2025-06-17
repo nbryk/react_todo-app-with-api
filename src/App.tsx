@@ -219,8 +219,8 @@ export const App: React.FC = () => {
           currentTodos.map(currentTodo =>
             idsToUpdate.includes(currentTodo.id)
               ? updatedTodos.find(
-                  updatedTodo => updatedTodo.id === currentTodo.id, // eslint-disable-line prettier/prettier
-                ) || currentTodo // eslint-disable-line prettier/prettier
+                updatedTodo => updatedTodo.id === currentTodo.id, // eslint-disable-line prettier/prettier
+              ) || currentTodo // eslint-disable-line prettier/prettier
               : currentTodo,
           ),
         );
