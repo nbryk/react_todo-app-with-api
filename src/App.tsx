@@ -10,7 +10,7 @@ import { ErrorNotification } from './components/ErrorNotification';
 import { TodoHeader } from './components/TodoHeader';
 import { TodoServiceErrors } from './types/TodoServiceErrors';
 import { TodoFooter } from './components/TodoFooter';
-import { TodoListSection } from './components/TodoListSection';
+import { TodoList } from './components/TodoList';
 
 export const App: React.FC = () => {
   const [todosFromServer, setTodosFromServer] = useState<Todo[]>([]);
@@ -68,7 +68,9 @@ export const App: React.FC = () => {
     });
   };
 
-  const filteredTodos = getFilteredTodos(todosFromServer, filterStatus);
+  const filteredTodos = useMemo(() => {
+    return getFilteredTodos(todosFromServer, filterStatus);
+  }, [todosFromServer, filterStatus]);
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -127,7 +129,9 @@ export const App: React.FC = () => {
       });
   };
 
-  const completedTodos = todosFromServer.some(todo => todo.completed);
+  const completedTodos = useMemo(() => {
+    return todosFromServer.some(todo => todo.completed);
+  }, [todosFromServer]);
 
   const handleClearCompleted = () => {
     const idsToDelete = todosFromServer
@@ -215,8 +219,8 @@ export const App: React.FC = () => {
           currentTodos.map(currentTodo =>
             idsToUpdate.includes(currentTodo.id)
               ? updatedTodos.find(
-                updatedTodo => updatedTodo.id === currentTodo.id, // eslint-disable-line prettier/prettier
-              ) || currentTodo // eslint-disable-line prettier/prettier
+                  updatedTodo => updatedTodo.id === currentTodo.id, // eslint-disable-line prettier/prettier
+                ) || currentTodo // eslint-disable-line prettier/prettier
               : currentTodo,
           ),
         );
@@ -309,7 +313,7 @@ export const App: React.FC = () => {
             <div className="loader" />
           </div>
         ) : (
-          <TodoListSection
+          <TodoList
             todos={filteredTodos}
             deletingTodoIds={deletingTodoIds}
             togglingTodoIds={togglingTodoIds}
@@ -323,7 +327,7 @@ export const App: React.FC = () => {
           />
         )}
 
-        {todosFromServer.length > 0 && (
+        {Boolean(todosFromServer.length) && (
           <TodoFooter
             activeTodosCount={activeTodosCount}
             filterStatus={filterStatus}
