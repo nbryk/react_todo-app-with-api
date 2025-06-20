@@ -25,11 +25,9 @@ export const App: React.FC = () => {
   const [newTodoTitle, setNewTodoTitle] = useState('');
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
 
-  const [deletingTodoIds, setDeletingTodoIds] = useState<number[]>([]);
-  const [togglingTodoIds, setTogglingTodoIds] = useState<number[]>([]);
-
   const [editingTodoId, setEditingTodoId] = useState<number | null>(null);
-  const [renamingTodoIds, setRenamingTodoIds] = useState<number[]>([]);
+
+  const [processingTodoIds, setPocessingTodoIds] = useState<number[]>([]);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -112,7 +110,7 @@ export const App: React.FC = () => {
   };
 
   const handleDeleteTodo = (todoId: number) => {
-    setDeletingTodoIds(currrentIds => [...currrentIds, todoId]);
+    setPocessingTodoIds(currrentIds => [...currrentIds, todoId]);
 
     deleteTodo(todoId)
       .then(() => {
@@ -124,7 +122,7 @@ export const App: React.FC = () => {
         setTodosErrorMessage(TodoServiceErrors.UnableToDeleteTodo);
       })
       .finally(() => {
-        setDeletingTodoIds(ids => ids.filter(id => id !== todoId));
+        setPocessingTodoIds(ids => ids.filter(id => id !== todoId));
         inputRef.current?.focus();
       });
   };
@@ -138,7 +136,7 @@ export const App: React.FC = () => {
       .filter(todo => todo.completed)
       .map(todo => todo.id);
 
-    setDeletingTodoIds(currentIds => [...currentIds, ...idsToDelete]);
+    setPocessingTodoIds(currentIds => [...currentIds, ...idsToDelete]);
 
     Promise.allSettled(idsToDelete.map(id => deleteTodo(id)))
       .then(results => {
@@ -157,7 +155,7 @@ export const App: React.FC = () => {
         );
       })
       .finally(() => {
-        setDeletingTodoIds(ids => ids.filter(id => !idsToDelete.includes(id)));
+        setPocessingTodoIds(ids => ids.filter(id => !idsToDelete.includes(id)));
         inputRef.current?.focus();
       });
   };
@@ -169,7 +167,7 @@ export const App: React.FC = () => {
   const handleToggleTodo = (todo: Todo) => {
     const updatedTodo = { ...todo, completed: !todo.completed };
 
-    setTogglingTodoIds(currentIds => [...currentIds, updatedTodo.id]);
+    setPocessingTodoIds(currentIds => [...currentIds, updatedTodo.id]);
 
     updateTodo(updatedTodo)
       .then(responseTodo => {
@@ -183,7 +181,7 @@ export const App: React.FC = () => {
         setTodosErrorMessage(TodoServiceErrors.UnableToUpdateTodo);
       })
       .finally(() => {
-        setTogglingTodoIds(currentIds =>
+        setPocessingTodoIds(currentIds =>
           currentIds.filter(currentId => currentId !== todo.id),
         );
       });
@@ -203,7 +201,7 @@ export const App: React.FC = () => {
 
     const idsToUpdate = todosToUpdate.map(todo => todo.id);
 
-    setTogglingTodoIds(currentIds => [...currentIds, ...idsToUpdate]);
+    setPocessingTodoIds(currentIds => [...currentIds, ...idsToUpdate]);
 
     Promise.allSettled(
       todosToUpdate.map(todo =>
@@ -219,8 +217,8 @@ export const App: React.FC = () => {
           currentTodos.map(currentTodo =>
             idsToUpdate.includes(currentTodo.id)
               ? updatedTodos.find(
-                updatedTodo => updatedTodo.id === currentTodo.id, // eslint-disable-line prettier/prettier
-              ) || currentTodo // eslint-disable-line prettier/prettier
+                  updatedTodo => updatedTodo.id === currentTodo.id, // eslint-disable-line prettier/prettier
+                ) || currentTodo // eslint-disable-line prettier/prettier
               : currentTodo,
           ),
         );
@@ -229,17 +227,17 @@ export const App: React.FC = () => {
         setTodosErrorMessage(TodoServiceErrors.UnableToUpdateTodo);
       })
       .finally(() => {
-        setTogglingTodoIds(currentIds =>
+        setPocessingTodoIds(currentIds =>
           currentIds.filter(id => !todosToUpdate.some(todo => todo.id === id)),
         );
       });
   };
 
-  const handleRenameTodo = (todo: Todo, newTitle: string) => {
+  const handleUpdateTodo = (todo: Todo, newTitle: string) => {
     const trimmedTitle = newTitle.trim();
 
     if (trimmedTitle === '') {
-      setDeletingTodoIds(current => [...current, todo.id]);
+      setPocessingTodoIds(current => [...current, todo.id]);
 
       deleteTodo(todo.id)
         .then(() => {
@@ -253,7 +251,7 @@ export const App: React.FC = () => {
           setTodosErrorMessage(TodoServiceErrors.UnableToDeleteTodo);
         })
         .finally(() => {
-          setDeletingTodoIds(ids => ids.filter(id => id !== todo.id));
+          setPocessingTodoIds(ids => ids.filter(id => id !== todo.id));
         });
 
       return;
@@ -267,7 +265,7 @@ export const App: React.FC = () => {
 
     const updatedTodo = { ...todo, title: trimmedTitle };
 
-    setRenamingTodoIds(ids => [...ids, todo.id]);
+    setPocessingTodoIds(ids => [...ids, todo.id]);
 
     updateTodo(updatedTodo)
       .then(responseTodo => {
@@ -283,7 +281,7 @@ export const App: React.FC = () => {
         setTodosErrorMessage(TodoServiceErrors.UnableToUpdateTodo);
       })
       .finally(() => {
-        setRenamingTodoIds(ids => ids.filter(id => id !== todo.id));
+        setPocessingTodoIds(ids => ids.filter(id => id !== todo.id));
       });
   };
 
@@ -315,15 +313,13 @@ export const App: React.FC = () => {
         ) : (
           <TodoList
             todos={filteredTodos}
-            deletingTodoIds={deletingTodoIds}
-            togglingTodoIds={togglingTodoIds}
+            processingTodoIds={processingTodoIds}
             tempTodo={tempTodo}
             handleDeleteTodo={handleDeleteTodo}
             handleToggleTodo={handleToggleTodo}
             editingTodoId={editingTodoId}
             setEditingTodoId={setEditingTodoId}
-            handleRenameTodo={handleRenameTodo}
-            renamingTodoIds={renamingTodoIds}
+            handleUpdateTodo={handleUpdateTodo}
           />
         )}
 

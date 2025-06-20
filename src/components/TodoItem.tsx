@@ -5,11 +5,9 @@ import { useState } from 'react';
 interface PropsTodoItem {
   todo: Todo;
   handleToggleTodo: (todo: Todo) => void;
-  deletingTodoIds: number[];
-  togglingTodoIds: number[];
-  renamingTodoIds: number[];
+  processingTodoIds: number[];
   editingTodoId: number | null;
-  handleRenameTodo: (todo: Todo, newTitle: string) => void;
+  handleUpdateTodo: (todo: Todo, newTitle: string) => void;
   setEditingTodoId: (id: number | null) => void;
   handleDeleteTodo: (id: number) => void;
   isTemp?: boolean;
@@ -18,16 +16,16 @@ interface PropsTodoItem {
 export const TodoItem = ({
   todo,
   handleToggleTodo,
-  deletingTodoIds,
-  togglingTodoIds,
-  renamingTodoIds,
+  processingTodoIds,
   editingTodoId,
-  handleRenameTodo,
+  handleUpdateTodo,
   setEditingTodoId,
   handleDeleteTodo,
   isTemp,
 }: PropsTodoItem) => {
   const [editedTitle, setEditedTitle] = useState('');
+
+  const isBeingEdited = editingTodoId === todo.id && !isTemp;
 
   return (
     <div
@@ -42,20 +40,15 @@ export const TodoItem = ({
           checked={todo.completed}
           aria-label="Toggle todo completion"
           onChange={() => handleToggleTodo(todo)}
-          disabled={
-            isTemp ||
-            deletingTodoIds.includes(todo.id) ||
-            togglingTodoIds.includes(todo.id) ||
-            renamingTodoIds.includes(todo.id)
-          }
+          disabled={isTemp || processingTodoIds.includes(todo.id)}
         />
       </label>
 
-      {editingTodoId === todo.id && !isTemp ? (
+      {isBeingEdited ? (
         <form
           onSubmit={event => {
             event.preventDefault();
-            handleRenameTodo(todo, editedTitle.trim());
+            handleUpdateTodo(todo, editedTitle.trim());
           }}
         >
           <input
@@ -65,7 +58,7 @@ export const TodoItem = ({
             placeholder="Empty todo will be deleted"
             value={editedTitle}
             onChange={event => setEditedTitle(event.target.value)}
-            onBlur={() => handleRenameTodo(todo, editedTitle.trim())}
+            onBlur={() => handleUpdateTodo(todo, editedTitle.trim())}
             onKeyUp={event => {
               if (event.key === 'Escape') {
                 setEditingTodoId(null);
@@ -90,33 +83,24 @@ export const TodoItem = ({
         </span>
       )}
 
-      {editingTodoId !== todo.id && !isTemp && (
+      {!isBeingEdited && (
         <button
           type="button"
           className="todo__remove"
           data-cy="TodoDelete"
           onClick={() => handleDeleteTodo(todo.id)}
-          disabled={
-            deletingTodoIds.includes(todo.id) ||
-            togglingTodoIds.includes(todo.id) ||
-            renamingTodoIds.includes(todo.id)
-          }
+          disabled={processingTodoIds.includes(todo.id)}
         >
           ×
         </button>
       )}
 
-      {(deletingTodoIds.includes(todo.id) ||
-        togglingTodoIds.includes(todo.id) ||
-        renamingTodoIds.includes(todo.id) ||
-        isTemp) && (
-        <div data-cy="TodoLoader" className="modal overlay is-active">
-          <div className="modal-background has-background-white-ter" />
-          <div className="loader" />
-        </div>
-      )}
-
-      <div data-cy="TodoLoader" className="modal overlay">
+      <div
+        data-cy="TodoLoader"
+        className={classNames('modal overlay', {
+          'is-active': processingTodoIds.includes(todo.id) || isTemp,
+        })}
+      >
         <div className="modal-background has-background-white-ter" />
         <div className="loader" />
       </div>

@@ -3,28 +3,24 @@ import { TodoItem } from './TodoItem';
 
 interface PropsTodoList {
   todos: Todo[];
-  deletingTodoIds: number[];
-  togglingTodoIds: number[];
+  processingTodoIds: number[];
   tempTodo: Todo | null;
   handleDeleteTodo: (id: number) => void;
   handleToggleTodo: (todo: Todo) => void;
   editingTodoId: number | null;
   setEditingTodoId: (id: number | null) => void;
-  handleRenameTodo: (todo: Todo, newTitle: string) => void;
-  renamingTodoIds: number[];
+  handleUpdateTodo: (todo: Todo, newTitle: string) => void;
 }
 
 export const TodoList = ({
   todos,
-  deletingTodoIds,
-  togglingTodoIds,
+  processingTodoIds,
   tempTodo,
   handleDeleteTodo,
   handleToggleTodo,
   editingTodoId,
   setEditingTodoId,
-  handleRenameTodo,
-  renamingTodoIds,
+  handleUpdateTodo,
 }: PropsTodoList) => {
   return (
     <section className="todoapp__main" data-cy="TodoList">
@@ -33,11 +29,9 @@ export const TodoList = ({
           key={todo.id}
           todo={todo}
           handleToggleTodo={handleToggleTodo}
-          deletingTodoIds={deletingTodoIds}
-          togglingTodoIds={togglingTodoIds}
-          renamingTodoIds={renamingTodoIds}
+          processingTodoIds={processingTodoIds}
           editingTodoId={editingTodoId}
-          handleRenameTodo={handleRenameTodo}
+          handleUpdateTodo={handleUpdateTodo}
           setEditingTodoId={setEditingTodoId}
           handleDeleteTodo={handleDeleteTodo}
         />
@@ -49,11 +43,9 @@ export const TodoList = ({
           todo={tempTodo}
           handleToggleTodo={() => {}}
           handleDeleteTodo={() => {}}
-          handleRenameTodo={() => {}}
+          handleUpdateTodo={() => {}}
           setEditingTodoId={() => {}}
-          deletingTodoIds={[]}
-          togglingTodoIds={[]}
-          renamingTodoIds={[]}
+          processingTodoIds={[]}
           editingTodoId={null}
           isTemp={true}
         />

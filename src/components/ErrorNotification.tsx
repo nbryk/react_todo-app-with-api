@@ -12,15 +12,15 @@ export const ErrorNotification: React.FC<PropsErrorNotification> = ({
   onClose,
 }) => {
   useEffect(() => {
-    if (message) {
-      const timer = setTimeout(() => {
-        onClose();
-      }, 3000);
-
-      return () => clearTimeout(timer);
+    if (!message) {
+      return;
     }
 
-    return undefined;
+    const timer = setTimeout(() => {
+      onClose();
+    }, 3000);
+
+    return () => clearTimeout(timer);
   }, [message, onClose]);
 
   return (
